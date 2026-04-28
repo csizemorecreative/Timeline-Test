@@ -1,6 +1,7 @@
 import ChevronLeft from '@mui/icons-material/ChevronLeft';
 import ChevronRight from '@mui/icons-material/ChevronRight';
 import CloseIcon from '@mui/icons-material/Close';
+import Box from '@mui/material/Box';
 import Dialog from '@mui/material/Dialog';
 import DialogContent from '@mui/material/DialogContent';
 import DialogTitle from '@mui/material/DialogTitle';
@@ -10,6 +11,7 @@ import Typography from '@mui/material/Typography';
 import { useEffect } from 'react';
 
 import type { TimelineEventPoint } from '../data/timelineEvents';
+import { TIMELINE_PLACEHOLDER_IMAGE } from '../timelinePlaceholderAsset';
 
 export interface TimelineSlideshowDialogProps {
   open: boolean;
@@ -90,15 +92,37 @@ export function TimelineSlideshowDialog({
       </DialogTitle>
       <DialogContent dividers>
         <Stack spacing={2}>
-          <Typography variant="overline" color="text.secondary">
-            {ev.name}
-          </Typography>
-          <Typography variant="h6" component="h2">
-            {ev.label}
-          </Typography>
-          <Typography variant="body1" sx={{ lineHeight: 1.7 }}>
-            {ev.description}
-          </Typography>
+          <Stack
+            direction={{ xs: 'column', sm: 'row' }}
+            spacing={2}
+            alignItems={{ xs: 'stretch', sm: 'flex-start' }}
+          >
+            <Box
+              component="img"
+              src={TIMELINE_PLACEHOLDER_IMAGE}
+              alt=""
+              sx={{
+                flexShrink: 0,
+                width: { xs: '100%', sm: 140 },
+                height: { xs: 160, sm: 140 },
+                objectFit: 'contain',
+                borderRadius: 1,
+                display: 'block',
+              }}
+              aria-hidden
+            />
+            <Stack spacing={2} sx={{ flex: 1, minWidth: 0 }}>
+              <Typography variant="overline" color="text.secondary">
+                {ev.name}
+              </Typography>
+              <Typography variant="h6" component="h2">
+                {ev.label}
+              </Typography>
+              <Typography variant="body1" sx={{ lineHeight: 1.7 }}>
+                {ev.description}
+              </Typography>
+            </Stack>
+          </Stack>
           <Typography variant="caption" color="text.secondary">
             Use arrow keys (← →) to move between items.
           </Typography>

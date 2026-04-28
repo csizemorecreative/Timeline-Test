@@ -18,13 +18,24 @@ import {
 } from '../data/timelineExtent';
 import Highcharts from '../highchartsSetup';
 import { timelineEvents } from '../data/timelineEvents';
+import { TIMELINE_PLACEHOLDER_IMAGE } from '../timelinePlaceholderAsset';
 
-import { TimelineMarkerFocusPanel } from './TimelineMarkerFocusPanel';
 import { TimelineRangeScrubber } from './TimelineRangeScrubber';
 import { TimelineSlideshowDialog } from './TimelineSlideshowDialog';
 
 const DOMAIN = getTimelineDomain();
 const N = timelineEvents.length;
+
+/** Solid marker / connector color (timeline points use one hue). */
+const TIMELINE_MARKER_BLUE = '#2e75b6';
+
+function escapeHtml(text: string): string {
+  return text
+    .replace(/&/g, '&amp;')
+    .replace(/</g, '&lt;')
+    .replace(/>/g, '&gt;')
+    .replace(/"/g, '&quot;');
+}
 
 export function CivilRightsTimelineChart() {
   const [range, setRange] = useState<[number, number]>(() => [
@@ -147,6 +158,7 @@ export function CivilRightsTimelineChart() {
       },
       plotOptions: {
         timeline: {
+          colorByPoint: false,
           point: {
             events: {
               click: function () {
@@ -177,35 +189,33 @@ export function CivilRightsTimelineChart() {
         visible: false,
       },
       tooltip: {
-        outside: true,
-        headerFormat:
-          '<span style="font-size: 0.85em">{point.point.name}</span><br/>',
-        pointFormat:
-          '<b>{point.label}</b><br/><span style="opacity:0.95">{point.description}</span>',
+        enabled: false,
       },
-      colors: [
-        '#1f4e79',
-        '#2e75b6',
-        '#5b9bd5',
-        '#9dc3e6',
-        '#4472c4',
-        '#548235',
-        '#70ad47',
-        '#a9d18e',
-        '#ed7d31',
-        '#f4b183',
-        '#7030a0',
-        '#c55a11',
-      ],
+      colors: [TIMELINE_MARKER_BLUE],
       series: [
         {
           type: 'timeline',
+          color: TIMELINE_MARKER_BLUE,
           cursor: 'pointer',
           dataLabels: {
             allowOverlap: false,
             alternate: true,
-            format:
-              '<span style="font-weight: bold; font-size: 12px">{point.label}</span><br><span style="font-weight: normal; opacity: 0.9">{point.name}</span>',
+            useHTML: true,
+            formatter: function () {
+              const pt = this as Highcharts.Point;
+              const opts = pt.options as { label?: string; name?: string };
+              const label = escapeHtml(String(opts.label ?? ''));
+              const name = escapeHtml(String(opts.name ?? pt.name ?? ''));
+              const src = TIMELINE_PLACEHOLDER_IMAGE;
+              return (
+                '<div style="display:flex;align-items:flex-start;gap:8px;">' +
+                `<img src="${src}" width="28" height="28" alt="" style="border-radius:4px;flex-shrink:0;object-fit:cover;" />` +
+                '<span style="text-align:left;">' +
+                `<span style="font-weight:bold;font-size:12px;display:block;color:#333333;">${label}</span>` +
+                `<span style="font-weight:normal;font-size:0.8em;opacity:0.9;color:#333333;">${name}</span>` +
+                '</span></div>'
+              );
+            },
           },
           marker: {
             symbol: 'circle',
@@ -220,9 +230,6 @@ export function CivilRightsTimelineChart() {
     }),
     [range, handleAfterSetExtremes],
   );
-
-  const focusedEvent =
-    focusedMarkerIndex !== null ? timelineEvents[focusedMarkerIndex] : null;
 
   return (
     <Paper
@@ -285,11 +292,6 @@ export function CivilRightsTimelineChart() {
             </IconButton>
           </Tooltip>
         </Stack>
-
-        <TimelineMarkerFocusPanel
-          event={focusedEvent}
-          onClear={() => setFocusedMarkerIndex(null)}
-        />
 
         <Box
           sx={{

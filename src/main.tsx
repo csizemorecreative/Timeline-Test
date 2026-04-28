@@ -4,7 +4,7 @@ import { ThemeProvider } from '@mui/material/styles';
 import CssBaseline from '@mui/material/CssBaseline';
 
 import App from './App';
-import { theme } from './theme';
+import { timelinePatronTheme } from './prometheusBridge/createTimelinePatronTheme';
 
 const rootEl = document.getElementById('root');
 if (!rootEl) {
@@ -13,7 +13,7 @@ if (!rootEl) {
 
 createRoot(rootEl).render(
   <StrictMode>
-    <ThemeProvider theme={theme}>
+    <ThemeProvider theme={timelinePatronTheme}>
       <CssBaseline />
       <App />
     </ThemeProvider>
