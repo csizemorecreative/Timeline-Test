@@ -1,7 +1,15 @@
 import { defineConfig } from 'vite';
 import react from '@vitejs/plugin-react';
 
+/** GitHub Project Pages live under /<repo-name>/; set at build time in CI (see .github/workflows). */
+function pagesBase(): string {
+  const raw = process.env.VITE_BASE_PATH?.trim();
+  if (!raw) return '/';
+  return raw.endsWith('/') ? raw : `${raw}/`;
+}
+
 export default defineConfig({
+  base: pagesBase(),
   plugins: [react()],
   server: {
     open: true,
